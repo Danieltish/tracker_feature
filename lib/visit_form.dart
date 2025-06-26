@@ -6,7 +6,10 @@ import 'services/api_service.dart';
 import 'screens/visit_list_screen.dart'; // Corrected import path for VisitListScreen
 
 class VisitForm extends StatefulWidget {
-  const VisitForm({Key? key}) : super(key: key);
+  final List<Customer> customers;
+  final List<Activity> activities;
+  const VisitForm({Key? key, required this.customers, required this.activities})
+    : super(key: key);
 
   @override
   State<VisitForm> createState() => _VisitFormState();
@@ -21,33 +24,6 @@ class _VisitFormState extends State<VisitForm> {
   String? notes;
   List<int> selectedActivities = [];
   bool isLoading = false;
-  List<Customer> customers = [];
-  List<Activity> activities = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchCustomers();
-    fetchActivities();
-  }
-
-  Future<void> fetchCustomers() async {
-    final data = await ApiService.fetch('customers');
-    setState(() {
-      customers = data
-          .map<Customer>((json) => Customer.fromJson(json))
-          .toList();
-    });
-  }
-
-  Future<void> fetchActivities() async {
-    final data = await ApiService.fetch('activities');
-    setState(() {
-      activities = data
-          .map<Activity>((json) => Activity.fromJson(json))
-          .toList();
-    });
-  }
 
   Future<void> addVisit() async {
     setState(() => isLoading = true);
@@ -129,7 +105,7 @@ class _VisitFormState extends State<VisitForm> {
                         prefixIcon: Icon(Icons.person_outline),
                         border: OutlineInputBorder(),
                       ),
-                      items: customers
+                      items: widget.customers
                           .map(
                             (c) => DropdownMenuItem(
                               value: c.id,
@@ -250,7 +226,7 @@ class _VisitFormState extends State<VisitForm> {
                         prefixIcon: Icon(Icons.checklist_outlined),
                       ),
                       child: Column(
-                        children: activities
+                        children: widget.activities
                             .map(
                               (activity) => CheckboxListTile(
                                 value: selectedActivities.contains(activity.id),

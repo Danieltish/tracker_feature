@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:ui';
 import 'supabase_client.dart';
 import 'screens/visit_form_screen.dart';
@@ -8,7 +9,7 @@ import 'screens/visit_stats_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initSupabase();
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -199,6 +200,52 @@ class _AnimatedHomeNavButtonState extends State<_AnimatedHomeNavButton> {
           ),
         ),
       ),
+    );
+  }
+}
+
+// Reusable error and loading widgets
+class AppErrorWidget extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+  const AppErrorWidget({required this.message, this.onRetry, Key? key})
+    : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            style: const TextStyle(color: Colors.redAccent, fontSize: 16),
+          ),
+          if (onRetry != null) ...[
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+              ),
+              onPressed: onRetry,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class AppLoadingWidget extends StatelessWidget {
+  const AppLoadingWidget({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(color: Colors.deepPurple),
     );
   }
 }
