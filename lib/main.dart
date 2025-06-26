@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'supabase_client.dart';
 import 'screens/visit_form_screen.dart';
 import 'screens/visit_list_screen.dart';
@@ -46,62 +47,104 @@ class HomeScreen extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.location_on, size: 80, color: Colors.white),
-            const SizedBox(height: 16),
-            Text(
-              'Visits Tracker',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Remove logo and extra title/subtitle for a clean, simple dashboard
+              const SizedBox(height: 60),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 32,
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.25),
+                    width: 1.2,
                   ),
-            ),
-            const SizedBox(height: 40),
-            _HomeNavButton(
-              icon: Icons.add_circle_outline,
-              label: 'Add Visit',
-              color: Colors.deepPurpleAccent,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const VisitFormScreen()),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _AnimatedHomeNavButton(
+                          icon: Icons.add_circle_outline,
+                          label: 'Add Visit',
+                          color: Colors.deepPurpleAccent,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const VisitFormScreen(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        _AnimatedHomeNavButton(
+                          icon: Icons.list_alt,
+                          label: 'View Visits',
+                          color: Colors.teal,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const VisitListScreen(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        _AnimatedHomeNavButton(
+                          icon: Icons.bar_chart,
+                          label: 'View Statistics',
+                          color: Colors.orangeAccent,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const VisitStatsScreen(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            _HomeNavButton(
-              icon: Icons.list_alt,
-              label: 'View Visits',
-              color: Colors.teal,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const VisitListScreen()),
+              const SizedBox(height: 40),
+              Text(
+                'Powered by Flutter & Supabase',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 1.1,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            _HomeNavButton(
-              icon: Icons.bar_chart,
-              label: 'View Statistics',
-              color: Colors.orangeAccent,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const VisitStatsScreen()),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _HomeNavButton extends StatelessWidget {
+class _AnimatedHomeNavButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
 
-  const _HomeNavButton({
+  const _AnimatedHomeNavButton({
     required this.icon,
     required this.label,
     required this.color,
@@ -109,38 +152,50 @@ class _HomeNavButton extends StatelessWidget {
   });
 
   @override
+  State<_AnimatedHomeNavButton> createState() => _AnimatedHomeNavButtonState();
+}
+
+class _AnimatedHomeNavButtonState extends State<_AnimatedHomeNavButton> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Ink(
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.18),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: color, size: 28),
-              const SizedBox(width: 16),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
+    return AnimatedScale(
+      scale: _isPressed ? 0.97 : 1.0,
+      duration: const Duration(milliseconds: 120),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: widget.onTap,
+        onHighlightChanged: (v) => setState(() => _isPressed = v),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: widget.color.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withOpacity(0.18),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 18),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(widget.icon, color: widget.color, size: 28),
+                const SizedBox(width: 16),
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    color: widget.color,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
