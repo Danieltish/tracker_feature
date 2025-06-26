@@ -11,6 +11,7 @@ class ApiService {
     'apikey': apiKey,
     'Authorization': 'Bearer $apiKey',
     'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
   };
 
   static Future<List<dynamic>> fetch(
@@ -39,7 +40,11 @@ class ApiService {
       body: jsonEncode(data),
     );
     if (response.statusCode == 201 || response.statusCode == 200) {
-      return jsonDecode(response.body);
+      if (response.body.isNotEmpty) {
+        return jsonDecode(response.body);
+      } else {
+        return null;
+      }
     } else {
       throw Exception('Failed to post to $endpoint');
     }
