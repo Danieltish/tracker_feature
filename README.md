@@ -8,6 +8,12 @@ This Flutter application allows users to track customer visits, view visit stati
 - ![Home Screen](screenshots/home.png)
 - ![Visit List](screenshots/visit_list.png)
 - ![Visit Statistics](screenshots/visit_stats.png)
+- ![Home page Mobile](screenshots/homepage_mobile.png)
+- ![schema](screenshots/schema.png)
+- ![Visit Form](screenshots/Visit_form.png)
+- ![Customers Table](screenshots/customers_tables.png)
+- ![Activities Table](screenshots/activities_table.png)
+- ![Visits Table](screenshots/visits_table.png)
 
 ## Key Architectural Choices
 - **Riverpod for State Management:** Ensures modular, testable, and maintainable state across the app.
